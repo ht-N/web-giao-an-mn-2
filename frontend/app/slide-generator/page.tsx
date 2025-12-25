@@ -86,39 +86,90 @@ export default function SlideGeneratorPage() {
         setStep("generating_content")
 
         try {
-            // After 3 seconds, move to generating_slide step to show progress
-            const progressTimer = setTimeout(() => {
-                setStep("generating_slide")
-            }, 3000)
+            // Build query string for the request
+            const params = new URLSearchParams({
+                stream: 'true'
+            });
 
-            const response = await fetch(`${API_BASE_URL}/api/ai/generate-slide`, {
+            const bodyData = {
+                schoolName: values.schoolName,
+                teacherName: values.teacherName,
+                teacherTitle: values.teacherTitle,
+                ageGroup: values.ageGroup,
+                topic: values.topic,
+                week: values.week,
+                activityType: values.activityType,
+                stockImages: !values.useAiImages,
+            };
 
+            // Use EventSource for SSE
+            const eventSource = new EventSource(
+                `${API_BASE_URL}/api/ai/generate-slide-stream?` + new URLSearchParams({
+                    ...bodyData,
+                    stream: 'true'
+                } as any).toString()
+            );
+
+            // Fallback: Use fetch with POST for SSE (since EventSource only supports GET)
+            // Actually, let's use fetch with streaming
+            const response = await fetch(`${API_BASE_URL}/api/ai/generate-slide?stream=true`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    schoolName: values.schoolName,
-                    teacherName: values.teacherName,
-                    teacherTitle: values.teacherTitle,
-                    ageGroup: values.ageGroup,
-                    topic: values.topic,
-                    week: values.week,
-                    activityType: values.activityType,
-                    stockImages: !values.useAiImages,
-                }),
-            })
-
-            clearTimeout(progressTimer)
-
-            const data = await response.json()
+                body: JSON.stringify(bodyData),
+            });
 
             if (!response.ok) {
-                throw new Error(data.error || "Có lỗi xảy ra khi tạo slide")
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Có lỗi xảy ra khi tạo slide");
             }
 
-            setResult(data)
-            setStep("done")
+            // Read the stream
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            if (reader) {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+
+                    // Parse SSE events from buffer
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.startsWith('event: ')) {
+                            const eventType = line.substring(7);
+                            continue;
+                        }
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+
+                                if (data.step === 'generating_slide') {
+                                    setStep('generating_slide');
+                                }
+
+                                if (data.success && data.gammaResult) {
+                                    setResult(data);
+                                    setStep("done");
+                                }
+
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+                            } catch (parseError) {
+                                // Ignore parse errors for incomplete data
+                            }
+                        }
+                    }
+                }
+            }
+
         } catch (err: any) {
             setError(err.message)
             setStep("input")
@@ -278,16 +329,11 @@ export default function SlideGeneratorPage() {
                                                     control={form.control}
                                                     name="topic"
                                                     render={({ field }) => (
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                            <SelectTrigger className="bg-white">
-                                                                <SelectValue placeholder="Chọn chủ đề" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {TOPICS.map(t => (
-                                                                    <SelectItem key={t} value={t}>{t}</SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
+                                                        <Input
+                                                            placeholder="VD: Gia đình, Động vật, Giao thông, Mùa xuân..."
+                                                            {...field}
+                                                            className="bg-white"
+                                                        />
                                                     )}
                                                 />
                                                 {errors.topic && <p className="text-red-500 text-xs">{errors.topic.message}</p>}
@@ -298,16 +344,11 @@ export default function SlideGeneratorPage() {
                                                     control={form.control}
                                                     name="activityType"
                                                     render={({ field }) => (
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                            <SelectTrigger className="bg-white">
-                                                                <SelectValue placeholder="Chọn hoạt động" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {ACTIVITIES.map(a => (
-                                                                    <SelectItem key={a} value={a}>{a}</SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
+                                                        <Input
+                                                            placeholder="VD: Làm quen với toán, Khám phá khoa học, Tạo hình..."
+                                                            {...field}
+                                                            className="bg-white"
+                                                        />
                                                     )}
                                                 />
                                                 {errors.activityType && <p className="text-red-500 text-xs">{errors.activityType.message}</p>}

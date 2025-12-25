@@ -168,6 +168,22 @@ const generatePreschoolSlide = async (req, res) => {
       return res.status(400).json({ error: "Vui lòng nhập Chủ đề và Độ tuổi" });
     }
 
+    // Setup SSE if client wants streaming
+    const useSSE = req.query.stream === 'true';
+    if (useSSE) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders();
+    }
+
+    // Helper function to send SSE events
+    const sendEvent = (event, data) => {
+      if (useSSE) {
+        res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+      }
+    };
+
     const fullTeacherName = teacherTitle ? `${teacherTitle} ${teacherName || "giáo"}` : (teacherName || "Cô giáo");
 
     // --- PROMPT ENGINEERING FOR GEMINI ---
@@ -243,6 +259,9 @@ const generatePreschoolSlide = async (req, res) => {
 
     const responseText = result.message.content[0].text;
 
+    // Send progress event: Content generated, now generating slide
+    sendEvent('progress', { step: 'generating_slide', message: 'Đã tạo xong nội dung, đang thiết kế slide...' });
+
     // Extract JSON from markdown code block if present
     let finalJsonStr = responseText;
     if (responseText.includes("```json")) {
@@ -308,15 +327,28 @@ const generatePreschoolSlide = async (req, res) => {
     }
 
     // Return response
-    res.json({
+    const responseData = {
       success: true,
       gammaResult: gammaResult,
       gammaConfigured: !!GAMMA_API_KEY
-    });
+    };
+
+    if (useSSE) {
+      sendEvent('done', responseData);
+      res.end();
+    } else {
+      res.json(responseData);
+    }
 
   } catch (error) {
     console.error("AI Error:", error);
-    res.status(500).json({ error: "Lỗi khi tạo nội dung slide: " + error.message });
+    if (res.headersSent) {
+      // SSE mode - send error event
+      res.write(`event: error\ndata: ${JSON.stringify({ error: "Lỗi khi tạo nội dung slide: " + error.message })}\n\n`);
+      res.end();
+    } else {
+      res.status(500).json({ error: "Lỗi khi tạo nội dung slide: " + error.message });
+    }
   }
 };
 
