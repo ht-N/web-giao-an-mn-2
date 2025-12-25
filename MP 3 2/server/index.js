@@ -60,7 +60,7 @@ async function callCohereChat(message, systemPrompt, jsonMode = false) {
     const response = await cohere.chat({
       message: message,
       preamble: systemPrompt,
-      model: 'command-r-08-2024',
+      model: 'command-a-03-2025',
       temperature: 0.1,
     });
 
@@ -183,7 +183,7 @@ app.post('/api/chat', async (req, res) => {
       message: message,
       preamble: preamble,
       chatHistory: chatHistory,
-      model: 'command-r-08-2024',
+      model: 'command-a-03-2025',
       temperature: 0.7
     });
 

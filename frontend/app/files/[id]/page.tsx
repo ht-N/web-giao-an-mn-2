@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Header from "@/components/header"
-import { getFileDetail, buyLesson, getAuthToken, getDownloadUrl } from "@/lib/api"
+import { getFileDetail, buyLesson, getAuthToken, getDownloadUrl, API_BASE_URL } from "@/lib/api"
+
 import { Loader2, Lock, Download, CheckCircle, ShoppingCart } from "lucide-react"
 import { useCart } from "@/context/cart-context"
 import DocumentViewer from "@/components/document-viewer"
@@ -42,7 +43,7 @@ export default function FileDetailPage() {
 
   const fetchOrders = async (token: string) => {
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+
       const res = await fetch(`${API_BASE_URL}/api/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -118,7 +119,7 @@ export default function FileDetailPage() {
   }
 
   const downloadWithAuth = async () => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+
     const token = getAuthToken()
     try {
       const res = await fetch(`${API_BASE_URL}/api/lessons/download/${fileId}`, {

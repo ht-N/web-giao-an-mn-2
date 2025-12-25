@@ -8,6 +8,8 @@ import { Loader2, Sparkles, Presentation, Download, CheckCircle2, User, Copy } f
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
+import { API_BASE_URL } from "@/lib/api"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -89,7 +91,8 @@ export default function SlideGeneratorPage() {
                 setStep("generating_slide")
             }, 3000)
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/ai/generate-slide`, {
+            const response = await fetch(`${API_BASE_URL}/api/ai/generate-slide`, {
+
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

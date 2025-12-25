@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import Header from "@/components/header"
 import { Building2, Download, FileSpreadsheet, Search } from "lucide-react"
+import { API_BASE_URL } from "@/lib/api"
+
 
 interface CompiledFile {
     name: string
@@ -16,7 +18,8 @@ export default function CompiledDataPage() {
     const [searchTerm, setSearchTerm] = useState("")
 
     useEffect(() => {
-        fetch("http://localhost:4000/api/compiled")
+        fetch(`${API_BASE_URL}/api/compiled`)
+
             .then(res => res.json())
             .then(data => {
                 setFiles(data.files || [])
@@ -86,7 +89,8 @@ export default function CompiledDataPage() {
                                         </div>
                                     </div>
                                     <a
-                                        href={`http://localhost:4000${file.url}`}
+                                        href={`${API_BASE_URL}${file.url}`}
+
                                         target="_blank"
                                         rel="noreferrer"
                                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-blue-600 hover:text-white transition"

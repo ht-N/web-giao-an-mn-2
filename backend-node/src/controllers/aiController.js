@@ -315,7 +315,7 @@ const generatePreschoolSlide = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("AI Error:", error);
     res.status(500).json({ error: "Lỗi khi tạo nội dung slide: " + error.message });
   }
 };
@@ -337,12 +337,24 @@ const generateLessonPlan = async (req, res) => {
 
     const userMessage = `Soạn giáo án: Đề tài ${topic}, Lứa tuổi ${ageGroup}, Thời gian ${duration}, Mục tiêu ${objectives}`;
 
-    const result = await model.generateContent([systemPrompt, userMessage]);
+    const result = await cohere.chat({
+      model: "command-a-03-2025",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt
+        },
+        {
+          role: "user",
+          content: userMessage
+        }
+      ]
+    });
 
-    res.json({ content: result.response.text() });
+    res.json({ content: result.message.content[0].text });
 
   } catch (error) {
-    console.error("Gemini Lesson Plan Error:", error);
+    console.error("AI Lesson Plan Error:", error);
     res.status(500).json({ error: error.message });
   }
 };

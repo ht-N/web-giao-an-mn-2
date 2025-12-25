@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
+
 
 interface DocumentViewerProps {
   fileId: string
@@ -36,7 +38,7 @@ export default function DocumentViewer({
         setError(null)
         setViewerType(null)
 
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+
         const queryParams = new URLSearchParams()
         queryParams.append("file_path", filePath)
 
