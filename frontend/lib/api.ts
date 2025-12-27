@@ -14,7 +14,8 @@ const getApiBaseUrl = () => {
 export const API_BASE_URL = getApiBaseUrl()
 
 // ChemLab API URL - Tự động detect hostname cho server Linux
-const getChemLabApiUrl = () => {
+// Export function thay vì constant để tránh lỗi SSR
+export const getChemLabApiUrl = () => {
   if (process.env.NEXT_PUBLIC_CHEMLAB_API_URL) return process.env.NEXT_PUBLIC_CHEMLAB_API_URL
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname
@@ -24,8 +25,6 @@ const getChemLabApiUrl = () => {
   }
   return "http://localhost:5175"
 }
-
-export const CHEMLAB_API_URL = getChemLabApiUrl()
 
 
 

@@ -18,7 +18,7 @@ import {
     Loader2,
     X,
 } from 'lucide-react';
-import { CHEMLAB_API_URL } from '@/lib/api';
+import { getChemLabApiUrl } from '@/lib/api';
 
 const PeriodicTest = () => {
     // Danh sách các bài kiểm tra
@@ -472,7 +472,7 @@ const PeriodicTest = () => {
 
         setIsGenerating(true);
         try {
-            const response = await fetch(`${CHEMLAB_API_URL}/api/generate-quiz`, {
+            const response = await fetch(`${getChemLabApiUrl()}/api/generate-quiz`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

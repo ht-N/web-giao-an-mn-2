@@ -3,8 +3,7 @@ npm install -g pm2
 ```
 
 ```bash
-cd /root/web-giao-an-mn-2/backend-node
-pm2 start server.js --name "backend-ai"
+pm2 start backend-node/server.js --name "backend-ai"
 ```
 
 ```bash
@@ -14,5 +13,5 @@ pm2 start npm --name "frontend-ai" -- start
 ```
 
 ```bash
-pm2 start "index.js" --name "chemlab-server"
+pm2 start MP\ 3\ 2/server/index.js --name "chemlab-server"
 ```
