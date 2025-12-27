@@ -1,6 +1,7 @@
 "use client"
 
-const getApiBaseUrl = () => {
+// API Base URL - Tự động detect hostname cho server Linux
+export const getApiBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname
@@ -11,7 +12,8 @@ const getApiBaseUrl = () => {
   return "http://localhost:4000"
 }
 
-export const API_BASE_URL = getApiBaseUrl()
+// Giữ lại constant cho backward compatibility, nhưng an toàn cho SSR
+export const API_BASE_URL = typeof window !== 'undefined' ? getApiBaseUrl() : "http://localhost:4000"
 
 // ChemLab API URL - Tự động detect hostname cho server Linux
 // Export function thay vì constant để tránh lỗi SSR
