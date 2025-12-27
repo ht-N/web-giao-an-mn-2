@@ -64,13 +64,9 @@ export default function DocumentViewer({
             setViewerType("unsupported")
             setError("Chế độ xem trước tài liệu Office (Word/Excel/PowerPoint) không hỗ trợ trên Localhost. Vui lòng tải xuống để xem.")
           } else {
-            // Tạo URL công khai để Google Docs Viewer có thể truy cập
             const publicUrl = directViewUrl.startsWith('http') ? directViewUrl : `${window.location.origin}${directViewUrl}`
             const encodedUrl = encodeURIComponent(publicUrl)
-
-            // Sử dụng Google Docs Viewer thay vì Microsoft Office Viewer
-            // Google Docs Viewer ít yêu cầu hơn và hoạt động tốt hơn
-            setViewUrl(`https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`)
+            setViewUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodedUrl}`)
             setViewerType("office")
           }
         } else if ([".txt", ".csv", ".json", ".xml", ".html", ".htm"].includes(ext)) {

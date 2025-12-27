@@ -208,7 +208,7 @@ const viewLesson = async (req, res) => {
             return res.status(404).json({ error: 'Lesson not found' });
         }
 
-        // Permission check for paid items - file miễn phí cho phép xem không cần auth
+        // Permission check for paid items - only allow full viewing if owned
         if (lesson.price > 0) {
             const authHeader = req.header('Authorization');
             const token = authHeader ? authHeader.replace('Bearer ', '') : req.query.token;
@@ -260,13 +260,8 @@ const viewLesson = async (req, res) => {
         };
 
         const contentType = contentTypes[extension] || 'application/octet-stream';
-
-        // Headers cho phép external viewers như Google Docs
         res.setHeader('Content-Type', contentType);
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://view.officeapps.live.com");
 
         res.sendFile(filePath);
     } catch (error) {

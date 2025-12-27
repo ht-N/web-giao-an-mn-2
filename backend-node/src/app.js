@@ -12,11 +12,7 @@ const aiRoutes = require('./routes/aiRoutes');
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: '*', // Cho phép tất cả origins để Google Docs Viewer có thể truy cập
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use(express.urlencoded({ extended: true }));

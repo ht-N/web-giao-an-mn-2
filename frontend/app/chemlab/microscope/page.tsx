@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Search, Microscope as MicroscopeIcon, FlaskConical, Atom, Info } from 'lucide-react';
 import MoleculeViewer from '../_components/MoleculeViewer';
-import { getChemLabApiUrl } from '@/lib/api';
 
 const Microscope = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +18,8 @@ const Microscope = () => {
         setMoleculeData(null);
 
         try {
-            const response = await fetch(`${getChemLabApiUrl()}/api/molecule`, {
+            const apiUrl = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || 'http://localhost:5175';
+            const response = await fetch(`${apiUrl}/api/molecule`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
