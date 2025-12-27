@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Sparkles, FlaskConical, Zap, Flame, AlertCircle, Microscope, X, Info } from 'lucide-react';
 import MoleculeViewer from '../_components/MoleculeViewer';
-import { API_BASE_URL, CHEMLAB_API_URL } from '@/lib/api';
 
 const Alchemist = () => {
     const [element1, setElement1] = useState('');
@@ -21,7 +20,7 @@ const Alchemist = () => {
         setShowMicroscope(false);
 
         try {
-            const apiUrl = CHEMLAB_API_URL;
+            const apiUrl = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || 'http://localhost:5175';
             const response = await fetch(`${apiUrl}/api/alchemist`, {
                 method: 'POST',
                 headers: {

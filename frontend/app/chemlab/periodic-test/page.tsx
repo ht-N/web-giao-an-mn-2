@@ -18,7 +18,6 @@ import {
     Loader2,
     X,
 } from 'lucide-react';
-import { CHEMLAB_API_URL } from '@/lib/api';
 
 const PeriodicTest = () => {
     // Danh sách các bài kiểm tra
@@ -470,8 +469,9 @@ const PeriodicTest = () => {
             return;
         }
 
+        setIsGenerating(true);
         try {
-            const apiUrl = CHEMLAB_API_URL;
+            const apiUrl = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || 'http://localhost:5175';
             const response = await fetch(`${apiUrl}/api/generate-quiz`, {
                 method: 'POST',
                 headers: {
@@ -537,7 +537,7 @@ const PeriodicTest = () => {
             let errorMessage = error.message || 'Không thể tạo bài kiểm tra.';
 
             if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.name === 'TypeError') {
-                errorMessage = `Không thể kết nối đến server tại ${CHEMLAB_API_URL}. Vui lòng:\n1. Đảm bảo server đang chạy\n2. Kiểm tra kết nối mạng\n3. Thử lại sau`;
+                errorMessage = 'Không thể kết nối đến server. Vui lòng:\n1. Đảm bảo server đang chạy tại http://localhost:5175\n2. Kiểm tra kết nối mạng\n3. Thử lại sau';
             }
 
             alert(errorMessage);
