@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import { CHEMLAB_API_URL } from '@/lib/api';
 import { Search, Microscope as MicroscopeIcon, FlaskConical, Atom, Info } from 'lucide-react';
 import MoleculeViewer from '../_components/MoleculeViewer';
 
@@ -18,7 +19,7 @@ const Microscope = () => {
         setMoleculeData(null);
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || 'http://localhost:5175';
+            const apiUrl = CHEMLAB_API_URL;
             const response = await fetch(`${apiUrl}/api/molecule`, {
                 method: 'POST',
                 headers: {

@@ -4,14 +4,30 @@ const getApiBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname
+    const protocol = window.location.protocol
+    // If accessing via IP or domain other than localhost, point to the same host on port 4000
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return `http://${hostname}:4000`
+      return `${protocol}//${hostname}:4000`
     }
   }
   return "http://localhost:4000"
 }
 
 export const API_BASE_URL = getApiBaseUrl()
+
+export const getChemlabApiUrl = () => {
+  if (process.env.NEXT_PUBLIC_CHEMLAB_API_URL) return process.env.NEXT_PUBLIC_CHEMLAB_API_URL
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname
+    const protocol = window.location.protocol
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return `${protocol}//${hostname}:5175`
+    }
+  }
+  return "http://localhost:5175"
+}
+
+export const CHEMLAB_API_URL = getChemlabApiUrl()
 
 
 
