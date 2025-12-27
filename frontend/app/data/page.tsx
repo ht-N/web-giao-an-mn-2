@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Header from "@/components/header"
 import { Building2, Download, FileSpreadsheet, Search } from "lucide-react"
 import { API_BASE_URL } from "@/lib/api"
 
@@ -43,8 +42,6 @@ export default function CompiledDataPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans">
-            <Header />
-
             <main className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 mb-4 flex items-center justify-center gap-3">

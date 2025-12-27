@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Header from "@/components/header"
 import { generateLessonPlan } from "@/lib/api"
 import { Loader2, Sparkles, Wand2, Download, Copy } from "lucide-react"
 import ReactMarkdown from "react-markdown"
@@ -55,8 +54,6 @@ export default function AILessonPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans">
-            <Header />
-
             <main className="max-w-[1400px] mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4 flex items-center justify-center gap-3">
