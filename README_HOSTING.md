@@ -12,3 +12,7 @@ cd /root/web-giao-an-mn-2/frontend
 npm run build
 pm2 start npm --name "frontend-ai" -- start
 ```
+
+```bash
+pm2 start "index.js" --name "chemlab-server"
+```

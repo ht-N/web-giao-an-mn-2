@@ -18,6 +18,7 @@ import {
     Loader2,
     X,
 } from 'lucide-react';
+import { CHEMLAB_API_URL } from '@/lib/api';
 
 const PeriodicTest = () => {
     // Danh sách các bài kiểm tra
@@ -471,8 +472,7 @@ const PeriodicTest = () => {
 
         setIsGenerating(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || 'http://localhost:5175';
-            const response = await fetch(`${apiUrl}/api/generate-quiz`, {
+            const response = await fetch(`${CHEMLAB_API_URL}/api/generate-quiz`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -537,7 +537,7 @@ const PeriodicTest = () => {
             let errorMessage = error.message || 'Không thể tạo bài kiểm tra.';
 
             if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.name === 'TypeError') {
-                errorMessage = 'Không thể kết nối đến server. Vui lòng:\n1. Đảm bảo server đang chạy tại http://localhost:5175\n2. Kiểm tra kết nối mạng\n3. Thử lại sau';
+                errorMessage = `Không thể kết nối đến server ChemLab. Vui lòng:\n1. Đảm bảo server đang chạy\n2. Kiểm tra kết nối mạng\n3. Thử lại sau`;
             }
 
             alert(errorMessage);
@@ -826,14 +826,14 @@ const PeriodicTest = () => {
                                         key={index}
                                         onClick={() => handleAnswerSelect(currentQuestion.id, index)}
                                         className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${isSelected
-                                                ? 'border-primary bg-primary/5 shadow-md'
-                                                : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50'
+                                            ? 'border-primary bg-primary/5 shadow-md'
+                                            : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected
-                                                    ? 'border-primary bg-primary'
-                                                    : 'border-gray-300'
+                                                ? 'border-primary bg-primary'
+                                                : 'border-gray-300'
                                                 }`}>
                                                 {isSelected && (
                                                     <div className="w-3 h-3 rounded-full bg-white" />
@@ -865,10 +865,10 @@ const PeriodicTest = () => {
                                     key={index}
                                     onClick={() => setCurrentQuestionIndex(index)}
                                     className={`w-10 h-10 rounded-lg font-semibold transition-all ${index === currentQuestionIndex
-                                            ? 'bg-primary text-white'
-                                            : answers[selectedTest.questions[index].id] !== undefined
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-primary text-white'
+                                        : answers[selectedTest.questions[index].id] !== undefined
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
                                     {index + 1}
@@ -907,9 +907,9 @@ const PeriodicTest = () => {
                     {/* Header kết quả */}
                     <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 text-center">
                         <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${score >= 90 ? 'bg-green-100' :
-                                score >= 75 ? 'bg-blue-100' :
-                                    score >= 60 ? 'bg-yellow-100' :
-                                        'bg-red-100'
+                            score >= 75 ? 'bg-blue-100' :
+                                score >= 60 ? 'bg-yellow-100' :
+                                    'bg-red-100'
                             }`}>
                             {score >= 90 ? (
                                 <Trophy className="w-10 h-10 text-green-600" />
@@ -1052,8 +1052,8 @@ const PeriodicTest = () => {
                                 <div
                                     key={q.id}
                                     className={`border-2 rounded-xl p-4 ${q.isCorrect
-                                            ? 'border-green-200 bg-green-50'
-                                            : 'border-red-200 bg-red-50'
+                                        ? 'border-green-200 bg-green-50'
+                                        : 'border-red-200 bg-red-50'
                                         }`}
                                 >
                                     <div className="flex items-start justify-between mb-2">
