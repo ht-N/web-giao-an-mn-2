@@ -180,8 +180,13 @@ const downloadLesson = async (req, res) => {
         }
 
         // Serve file
-        const filePath = path.resolve(lesson.fileUrl);
+        const normalizedPath = lesson.fileUrl.replace(/\\/g, '/');
+        const filePath = path.resolve(normalizedPath);
+
+        console.log(`Downloading: ${filePath}`);
+
         if (!fs.existsSync(filePath)) {
+            console.error(`File NOT found: ${filePath}`);
             return res.status(404).json({ error: 'File not found on server' });
         }
 
@@ -239,8 +244,13 @@ const viewLesson = async (req, res) => {
             }
         }
 
-        const filePath = path.resolve(lesson.fileUrl);
+        const normalizedPath = lesson.fileUrl.replace(/\\/g, '/');
+        const filePath = path.resolve(normalizedPath);
+
+        console.log(`Viewing: ${filePath}`);
+
         if (!fs.existsSync(filePath)) {
+            console.error(`File NOT found: ${filePath}`);
             return res.status(404).json({ error: 'File not found on server' });
         }
 
