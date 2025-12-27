@@ -1,7 +1,8 @@
-"use client"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { API_BASE_URL } from "@/lib/api"
+import * as mammoth from "mammoth"
+import * as XLSX from "xlsx"
+import { Loader2, FileText, Download, AlertCircle, FileSpreadsheet, FilePieChart, FileQuestion } from "lucide-react"
 
 
 interface DocumentViewerProps {
@@ -22,7 +23,9 @@ export default function DocumentViewer({
   const [viewUrl, setViewUrl] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [viewerType, setViewerType] = useState<"iframe" | "image" | "office" | "unsupported" | null>(null)
+  const [viewerType, setViewerType] = useState<"iframe" | "image" | "office" | "docx" | "xlsx" | "unsupported" | null>(null)
+  const [renderedContent, setRenderedContent] = useState<any>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!fileId || !filePath) {
@@ -57,17 +60,68 @@ export default function DocumentViewer({
         } else if ([".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp"].includes(ext)) {
           setViewUrl(directViewUrl)
           setViewerType("image")
-        } else if ([".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"].includes(ext)) {
+        } else if ([".docx", ".doc"].includes(ext)) {
+          // Xử lý Word
           const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
 
-          if (isLocalhost) {
-            setViewerType("unsupported")
-            setError("Chế độ xem trước tài liệu Office (Word/Excel/PowerPoint) không hỗ trợ trên Localhost. Vui lòng tải xuống để xem.")
+          if (ext === ".docx" && (isLocalhost || true)) { // Ưu tiên mammoth trên local, có thể dùng luôn trên server vì nó nhẹ
+            try {
+              const response = await fetch(directViewUrl)
+              const arrayBuffer = await response.arrayBuffer()
+              const result = await mammoth.convertToHtml({ arrayBuffer })
+              setRenderedContent(result.value)
+              setViewerType("docx")
+            } catch (err) {
+              console.error("Mammoth error:", err)
+              // Nếu mammoth lỗi, thử fallback sang Office Online nếu không phải localhost
+              if (!isLocalhost) {
+                fallbackToOffice(directViewUrl)
+              } else {
+                throw new Error("Không thể render file Word này trên local.")
+              }
+            }
+          } else if (!isLocalhost) {
+            fallbackToOffice(directViewUrl)
           } else {
-            const publicUrl = directViewUrl.startsWith('http') ? directViewUrl : `${window.location.origin}${directViewUrl}`
-            const encodedUrl = encodeURIComponent(publicUrl)
-            setViewUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodedUrl}`)
-            setViewerType("office")
+            setViewerType("unsupported")
+            setError("Định dạng .doc (cũ) không hỗ trợ xem trên local. Vui lòng tải xuống.")
+          }
+        } else if ([".xlsx", ".xls"].includes(ext)) {
+          // Xử lý Excel
+          const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+
+          if (ext === ".xlsx" && (isLocalhost || true)) {
+            try {
+              const response = await fetch(directViewUrl)
+              const arrayBuffer = await response.arrayBuffer()
+              const workbook = XLSX.read(arrayBuffer, { type: 'array' })
+              const firstSheetName = workbook.SheetNames[0]
+              const worksheet = workbook.Sheets[firstSheetName]
+              const html = XLSX.utils.sheet_to_html(worksheet)
+              setRenderedContent(html)
+              setViewerType("xlsx")
+            } catch (err) {
+              console.error("XLSX error:", err)
+              if (!isLocalhost) {
+                fallbackToOffice(directViewUrl)
+              } else {
+                throw new Error("Không thể render file Excel này trên local.")
+              }
+            }
+          } else if (!isLocalhost) {
+            fallbackToOffice(directViewUrl)
+          } else {
+            setViewerType("unsupported")
+            setError("Định dạng .xls (cũ) không hỗ trợ xem trên local. Vui lòng tải xuống.")
+          }
+        } else if ([".pptx", ".ppt"].includes(ext)) {
+          // PowerPoint vẫn ưu tiên Office Online
+          const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+          if (!isLocalhost) {
+            fallbackToOffice(directViewUrl)
+          } else {
+            setViewerType("unsupported")
+            setError("Xem trước PowerPoint hiện chưa hỗ trợ trên local. Vui lòng tải xuống để xem.")
           }
         } else if ([".txt", ".csv", ".json", ".xml", ".html", ".htm"].includes(ext)) {
           setViewUrl(directViewUrl)
@@ -78,11 +132,18 @@ export default function DocumentViewer({
         }
       } catch (err) {
         console.error("Failed to load viewer:", err)
-        setError("Không thể tải file để xem")
+        setError("Không thể hiển thị bản xem trước. Vui lòng tải xuống để xem trực tiếp.")
         setViewerType("unsupported")
       } finally {
         setLoading(false)
       }
+    }
+
+    const fallbackToOffice = (url: string) => {
+      const publicUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`
+      const encodedUrl = encodeURIComponent(publicUrl)
+      setViewUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodedUrl}`)
+      setViewerType("office")
     }
 
     loadViewer()
@@ -132,7 +193,7 @@ export default function DocumentViewer({
 
   if (viewerType === "iframe" || viewerType === "office") {
     return (
-      <div className="w-full border-2 border-border rounded-lg overflow-hidden bg-white">
+      <div className="w-full border-2 border-border rounded-lg overflow-hidden bg-white relative">
         <iframe
           src={viewUrl}
           className="w-full h-[800px] border-0"
@@ -144,6 +205,96 @@ export default function DocumentViewer({
             setViewerType("unsupported")
           }}
         />
+        {viewerType === "office" && (
+          <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-[10px] text-gray-500 border border-gray-200 pointer-events-none">
+            Powered by Microsoft Office Online
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  if (viewerType === "docx") {
+    return (
+      <div className="w-full border-2 border-border rounded-lg overflow-hidden bg-gray-100 p-4 md:p-8 flex justify-center h-[800px] overflow-y-auto">
+        <div
+          className="bg-white shadow-2xl p-8 md:p-16 max-w-4xl w-full min-h-full docx-viewer"
+          dangerouslySetInnerHTML={{ __html: renderedContent }}
+        />
+        <style jsx global>{`
+          .docx-viewer {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+          }
+          .docx-viewer h1 { font-size: 2.2em; font-weight: 700; margin: 0.8em 0; color: #000; }
+          .docx-viewer h2 { font-size: 1.8em; font-weight: 600; margin: 0.7em 0; color: #333; }
+          .docx-viewer h3 { font-size: 1.4em; font-weight: 600; margin: 0.6em 0; color: #444; }
+          .docx-viewer p { margin: 1.2em 0; }
+          .docx-viewer img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1.5em auto;
+            border-radius: 4px;
+          }
+          .docx-viewer table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1.5em 0;
+            border: 1px solid #000;
+          }
+          .docx-viewer td, .docx-viewer th {
+            border: 1px solid #ccc;
+            padding: 10px;
+            vertical-align: top;
+          }
+          .docx-viewer th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+          }
+          .docx-viewer ul, .docx-viewer ol {
+            padding-left: 30px;
+            margin: 1em 0;
+          }
+          .docx-viewer li {
+            margin-bottom: 0.5em;
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  if (viewerType === "xlsx") {
+    return (
+      <div className="w-full border-2 border-border rounded-lg overflow-hidden bg-white h-[800px] overflow-auto">
+        <div className="p-4 bg-green-50 border-b border-green-100 flex items-center gap-2 sticky top-0 z-10">
+          <FileSpreadsheet className="w-5 h-5 text-green-600" />
+          <span className="font-semibold text-green-800 text-sm">Xem trước bảng tính Excel</span>
+        </div>
+        <div
+          className="xlsx-viewer p-4"
+          dangerouslySetInnerHTML={{ __html: renderedContent }}
+        />
+        <style jsx global>{`
+          .xlsx-viewer table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 13px;
+          }
+          .xlsx-viewer td, .xlsx-viewer th {
+            border: 1px solid #e2e8f0;
+            padding: 6px 10px;
+            white-space: nowrap;
+          }
+          .xlsx-viewer th {
+            background-color: #f8fafc;
+            font-weight: 600;
+          }
+          .xlsx-viewer tr:hover {
+            background-color: #f1f5f9;
+          }
+        `}</style>
       </div>
     )
   }

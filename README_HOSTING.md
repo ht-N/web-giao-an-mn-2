@@ -13,5 +13,6 @@ pm2 start npm --name "frontend-ai" -- start
 ```
 
 ```bash
-pm2 start MP\ 3\ 2/server/index.js --name "chemlab-server"
+cd MP\ 3\ 2\server
+pm2 start index.js --name "chemlab-server"
 ```
