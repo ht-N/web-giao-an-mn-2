@@ -83,11 +83,8 @@ export function getDownloadUrl(fileId: string, filePath?: string): string {
 }
 
 export function getFileViewUrl(fileId: string, filePath?: string): string {
-  const token = getAuthToken()
-  const url = new URL(`${API_BASE_URL}/api/files/${fileId}/view`)
-  if (token) url.searchParams.append('token', token)
-  if (filePath) url.searchParams.append('file_path', filePath)
-  return url.toString()
+  // For now, view URL is same as download or simplified
+  return `${API_BASE_URL}/api/lessons/download/${fileId}`
 }
 
 export async function getRelatedFiles(fileId: string, filePath?: string, limit: number = 5): Promise<FileListResponse> {
