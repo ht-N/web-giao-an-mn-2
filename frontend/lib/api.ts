@@ -1,6 +1,7 @@
 "use client"
 
 // API Base URL - Tự động detect hostname cho server Linux
+// LUÔN sử dụng function để tránh hydration error
 export const getApiBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL
   if (typeof window !== 'undefined') {
@@ -12,11 +13,11 @@ export const getApiBaseUrl = () => {
   return "http://localhost:4000"
 }
 
-// Giữ lại constant cho backward compatibility, nhưng an toàn cho SSR
-export const API_BASE_URL = typeof window !== 'undefined' ? getApiBaseUrl() : "http://localhost:4000"
+// Constant cho backward compatibility - luôn dùng localhost để tránh hydration mismatch
+// Các component nên gọi getApiBaseUrl() trong useEffect hoặc event handlers
+export const API_BASE_URL = "http://localhost:4000"
 
 // ChemLab API URL - Tự động detect hostname cho server Linux
-// Export function thay vì constant để tránh lỗi SSR
 export const getChemLabApiUrl = () => {
   if (process.env.NEXT_PUBLIC_CHEMLAB_API_URL) return process.env.NEXT_PUBLIC_CHEMLAB_API_URL
   if (typeof window !== 'undefined') {
