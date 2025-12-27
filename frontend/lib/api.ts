@@ -1,17 +1,16 @@
-"use client"
-
-const getApiBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL
+const getBaseUrl = (port: number) => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname
+    const protocol = window.location.protocol
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return `http://${hostname}:4000`
+      return `${protocol}//${hostname}:${port}`
     }
   }
-  return "http://localhost:4000"
+  return `http://localhost:${port}`
 }
 
-export const API_BASE_URL = getApiBaseUrl()
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || getBaseUrl(4000)
+export const CHEMLAB_API_URL = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || getBaseUrl(5175)
 
 
 
