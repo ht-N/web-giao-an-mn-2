@@ -38,8 +38,8 @@ module.exports = {
         },
         {
             name: 'chemlab-server',
-            script: './MP 3 2/server/index.js',
-            interpreter: 'node',
+            cwd: './MP 3 2/server',
+            script: 'index.js',
             env: {
                 NODE_ENV: 'development',
                 PORT: 5175
