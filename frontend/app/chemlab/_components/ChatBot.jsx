@@ -117,10 +117,9 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
 
             if (error.name === 'AbortError') {
                 errorContent = 'Yêu cầu bị timeout. Vui lòng thử lại với câu hỏi ngắn gọn hơn.';
-            } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('fetch')) {
-                errorContent = 'Không thể kết nối đến server. Vui lòng:\n1. Đảm bảo server đang chạy tại http://localhost:5175\n2. Kiểm tra kết nối mạng\n3. Thử lại sau';
+                errorContent = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng và thử lại sau.';
             } else if (error.message.includes('404') || error.message.includes('không tìm thấy')) {
-                errorContent = 'Không tìm thấy API endpoint.\nVui lòng:\n1. Kiểm tra server đang chạy tại http://localhost:5175\n2. Kiểm tra console để xem chi tiết lỗi';
+                errorContent = 'Không tìm thấy API endpoint. Vui lòng kiểm tra console để xem chi tiết lỗi.';
             } else if (error.message.includes('429') || error.message.includes('quota') || error.message.includes('giới hạn')) {
                 errorContent = 'Đã vượt quá giới hạn số lượng yêu cầu.\nVui lòng:\n1. Đợi vài phút rồi thử lại\n2. Hoặc kiểm tra quota của API key';
             } else if (error.message) {

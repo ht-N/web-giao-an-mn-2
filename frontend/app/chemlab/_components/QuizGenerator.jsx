@@ -45,7 +45,7 @@ const QuizGenerator = ({ reactionTitle, reactionDescription, onClose }) => {
             }
         } catch (err) {
             console.error('Error generating quiz:', err);
-            setError(err.message || 'Không thể kết nối đến server. Đảm bảo backend đang chạy tại http://localhost:5175');
+            setError(err.message || 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng và thử lại sau.');
         } finally {
             setLoading(false);
         }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, FlaskConical, Zap, Flame, AlertCircle, Microscope, X, Info } from 'lucide-react';
 import MoleculeViewer from '../components/MoleculeViewer';
+import { API_URL } from '../config/api';
 
 const Alchemist = () => {
     const [element1, setElement1] = useState('');
@@ -19,8 +20,7 @@ const Alchemist = () => {
         setShowMicroscope(false);
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5175';
-            const response = await fetch(`${apiUrl}/api/alchemist`, {
+            const response = await fetch(`${API_URL}/api/alchemist`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

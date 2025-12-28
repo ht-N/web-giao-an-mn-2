@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Microscope as MicroscopeIcon, FlaskConical, Atom, Info } from 'lucide-react';
 import MoleculeViewer from '../components/MoleculeViewer';
+import { API_URL } from '../config/api';
 
 const Microscope = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -17,8 +18,7 @@ const Microscope = () => {
         setMoleculeData(null);
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5175';
-            const response = await fetch(`${apiUrl}/api/molecule`, {
+            const response = await fetch(`${API_URL}/api/molecule`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Brain, Loader2, CheckCircle2, XCircle, Sparkles, RefreshCw } from 'lucide-react';
+import { API_URL } from '../config/api';
 
 const QuizGenerator = ({ reactionTitle, reactionDescription, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -18,8 +19,7 @@ const QuizGenerator = ({ reactionTitle, reactionDescription, onClose }) => {
         setScore(0);
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5175';
-            const response = await fetch(`${apiUrl}/api/generate-quiz`, {
+            const response = await fetch(`${API_URL}/api/generate-quiz`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ const QuizGenerator = ({ reactionTitle, reactionDescription, onClose }) => {
             }
         } catch (err) {
             console.error('Error generating quiz:', err);
-            setError(err.message || 'Không thể kết nối đến server. Đảm bảo backend đang chạy tại http://localhost:5175');
+            setError(err.message || 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng và thử lại sau.');
         } finally {
             setLoading(false);
         }

@@ -9,6 +9,8 @@ import {
     Minimize2,
     Maximize2,
 } from 'lucide-react';
+import { API_URL } from '../config/api';
+
 
 const ChatBot = ({ contextTitle, contextDescription }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -51,13 +53,11 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
         setIsLoading(true);
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5175';
-            
             // Tạo AbortController để có thể timeout (giảm xuống 30 giây)
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 giây timeout
-            
-            const response = await fetch(`${apiUrl}/api/chat`, {
+
+            const response = await fetch(`${API_URL}/api/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
                 }),
                 signal: controller.signal
             });
-            
+
             clearTimeout(timeoutId);
 
             if (!response.ok) {
@@ -85,7 +85,7 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
                     errorMessage = errorData.error || errorData.details || errorMessage;
                 } catch (e) {
                     // Nếu không parse được JSON, dùng status text
-                    errorMessage = response.status === 404 
+                    errorMessage = response.status === 404
                         ? 'Không tìm thấy API endpoint. Vui lòng kiểm tra server đang chạy đúng.'
                         : `Lỗi ${response.status}: ${response.statusText}`;
                 }
@@ -113,19 +113,19 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
         } catch (error) {
             console.error('Error sending message:', error);
             let errorContent = 'Xin lỗi, có lỗi xảy ra khi kết nối đến AI.';
-            
+
             if (error.name === 'AbortError') {
                 errorContent = 'Yêu cầu bị timeout. Vui lòng thử lại với câu hỏi ngắn gọn hơn.';
             } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('fetch')) {
-                errorContent = 'Không thể kết nối đến server. Vui lòng:\n1. Đảm bảo server đang chạy tại http://localhost:5175\n2. Kiểm tra kết nối mạng\n3. Thử lại sau';
+                errorContent = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng và thử lại sau.';
             } else if (error.message.includes('404') || error.message.includes('không tìm thấy')) {
-                errorContent = 'Không tìm thấy API endpoint.\nVui lòng:\n1. Kiểm tra server đang chạy tại http://localhost:5175\n2. Kiểm tra console để xem chi tiết lỗi';
+                errorContent = 'Không tìm thấy API endpoint. Vui lòng kiểm tra console để xem chi tiết lỗi.';
             } else if (error.message.includes('429') || error.message.includes('quota') || error.message.includes('giới hạn')) {
                 errorContent = 'Đã vượt quá giới hạn số lượng yêu cầu.\nVui lòng:\n1. Đợi vài phút rồi thử lại\n2. Hoặc kiểm tra quota của API key';
             } else if (error.message) {
                 errorContent = error.message.startsWith('Lỗi:') ? error.message : `Lỗi: ${error.message}`;
             }
-            
+
             const errorMessage = {
                 role: 'assistant',
                 content: errorContent
@@ -167,9 +167,8 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
 
     return (
         <div
-            className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
-                isMinimized ? 'w-80' : 'w-96'
-            }`}
+            className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${isMinimized ? 'w-80' : 'w-96'
+                }`}
         >
             <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
                 {/* Header */}
@@ -220,11 +219,10 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
                                         </div>
                                     )}
                                     <div
-                                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                                            message.role === 'user'
+                                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${message.role === 'user'
                                                 ? 'bg-gradient-to-r from-primary-600 to-blue-600 text-white'
                                                 : 'bg-white text-gray-900 border border-gray-200'
-                                        }`}
+                                            }`}
                                     >
                                         <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                                     </div>
