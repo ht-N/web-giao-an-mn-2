@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Brain, Loader2, CheckCircle2, XCircle, Sparkles, RefreshCw } from 'lucide-react';
+import { CHEMLAB_API_URL } from '@/lib/api';
 
 const QuizGenerator = ({ reactionTitle, reactionDescription, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ const QuizGenerator = ({ reactionTitle, reactionDescription, onClose }) => {
         setScore(0);
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || 'http://localhost:5175';
+            const apiUrl = CHEMLAB_API_URL;
             const response = await fetch(`${apiUrl}/api/generate-quiz`, {
                 method: 'POST',
                 headers: {

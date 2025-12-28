@@ -9,6 +9,7 @@ import {
     Minimize2,
     Maximize2,
 } from 'lucide-react';
+import { CHEMLAB_API_URL } from '@/lib/api';
 
 const ChatBot = ({ contextTitle, contextDescription }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +52,7 @@ const ChatBot = ({ contextTitle, contextDescription }) => {
         setIsLoading(true);
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_CHEMLAB_API_URL || 'http://localhost:5175';
+            const apiUrl = CHEMLAB_API_URL;
 
             // Tạo AbortController để có thể timeout (giảm xuống 30 giây)
             const controller = new AbortController();

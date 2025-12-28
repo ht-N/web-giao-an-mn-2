@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5175;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173'],
+  origin: '*', // Allow all origins for easier deployment, or specify your IP
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
@@ -303,6 +303,6 @@ Nếu không tìm thấy: { "valid": false, "error": "Không tìm thấy" } `;
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', provider: 'cohere' }));
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server (Cohere) running on port ${PORT}`);
 });
