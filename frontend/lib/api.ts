@@ -4,8 +4,12 @@ const getApiBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname
+    // Khi deploy (không phải localhost), dùng relative URL để Nginx proxy
+    // Điều này giúp tránh lỗi Mixed Content khi dùng HTTPS
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return `http://${hostname}:4000`
+      // Trả về empty string để dùng relative URL (same origin)
+      // Frontend sẽ gọi /api/... và Nginx sẽ proxy đến backend
+      return ''
     }
   }
   return "http://localhost:4000"
@@ -15,8 +19,10 @@ const getChemLabApiBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_CHEMLAB_API_URL) return process.env.NEXT_PUBLIC_CHEMLAB_API_URL
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname
+    // Khi deploy (không phải localhost), dùng relative URL để Nginx proxy
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return `http://${hostname}:5175`
+      // Trả về empty string để dùng relative URL (same origin)
+      return ''
     }
   }
   return "http://localhost:5175"
