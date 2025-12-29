@@ -46,10 +46,10 @@ export default function CurriculumGrid({ items, currentPage, itemsPerPage, onPag
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {paginatedItems.map((item) => {
-          const fileUrl = item.filePath 
+          const fileUrl = item.filePath
             ? `/files/${item.id}?file_path=${encodeURIComponent(item.filePath)}`
             : `/files/${item.id}`
-          
+
           return (
             <Link
               key={item.id}
@@ -60,7 +60,7 @@ export default function CurriculumGrid({ items, currentPage, itemsPerPage, onPag
               <div className="relative h-64 overflow-hidden bg-muted flex-shrink-0">
                 <img
                   src={
-                    item.thumbnailUrl 
+                    item.thumbnailUrl
                       ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}${item.thumbnailUrl}`
                       : item.image || "/placeholder.svg"
                   }
@@ -121,11 +121,10 @@ export default function CurriculumGrid({ items, currentPage, itemsPerPage, onPag
             <button
               key={page}
               onClick={() => onPageChange(page)}
-              className={`px-4 py-2 rounded-lg font-semibold text-label transition font-heading ${
-                currentPage === page
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-white border-2 border-border text-foreground hover:bg-primary/5"
-              }`}
+              className={`px-4 py-2 rounded-lg font-semibold text-label transition font-heading ${currentPage === page
+                ? "bg-primary text-primary-foreground"
+                : "bg-white border-2 border-border text-foreground hover:bg-primary/5"
+                }`}
             >
               {page}
             </button>
